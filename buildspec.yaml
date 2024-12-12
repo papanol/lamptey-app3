@@ -1,0 +1,35 @@
+version: 0.2  # Specifies the version of the buildspec format being used
+
+env:  # Environment variables for the build process
+  variables:
+    CONTAINER_NAME: "Python-App-8000"  # Name of the container from your ECS task definition (adjust as needed)
+    REPOSITORY_URI: "992382625926.dkr.ecr.us-east-1.amazonaws.com/bobdocbryan/pythonapp"  # URI of the ECR repository
+
+phases:  # Defines the phases of the build process
+
+  install:  # Install dependencies or any pre-configuration tasks
+    runtime-versions:
+      python: 3.12  # Specifies the version of Python to use for the build
+    commands:
+      - pip install --upgrade pip  # Upgrades pip to the latest version
+
+  pre_build:  # Steps to run before the actual build starts
+    commands:
+      - echo Logging in to Amazon ECR...  # Logs a message to indicate that login is happening
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 992382625926.dkr.ecr.us-east-1.amazonaws.com  # Logs into ECR using AWS credentials
+
+  build:  # Actual build phase
+    commands:
+      - echo Build started on `date`  # Prints the current date and time for reference
+      - docker build -t bobdocbryan/pythonapp:latest .  # Builds the Docker image and tags it with 'latest'
+      - docker tag bobdocbryan/pythonapp:latest $REPOSITORY_URI:latest  # Tags the Docker image with the repository URI
+
+  post_build:  # Post-build steps to finalize the process
+    commands:
+      - echo Build completed on `date`  # Prints the completion time for reference
+      - docker push $REPOSITORY_URI:latest  # Pushes the Docker image to the specified ECR repository
+      - printf '[{"name":"%s","imageUri":"%s"}]' $CONTAINER_NAME $REPOSITORY_URI:latest > imagedefinitions.json  # Generates the imagedefinitions.json file for ECS deployment
+
+artifacts:  # Defines the output files that will be generated from the build
+  files: 
+    - imagedefinitions.json  # Specifies the file to be used for ECS deployment
