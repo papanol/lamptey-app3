@@ -2,8 +2,8 @@ version: 0.2  # Specifies the version of the buildspec format being used
 
 env:  # Environment variables for the build process
   variables:
-    CONTAINER_NAME: "Python-App-8000"  # Name of the container from your ECS task definition (adjust as needed)
-    REPOSITORY_URI: "992382625926.dkr.ecr.us-east-1.amazonaws.com/bobdocbryan/pythonapp"  # URI of the ECR repository
+    CONTAINER_NAME: "web_image"  # Updated container name
+    REPOSITORY_URI: "112547104148.dkr.ecr.us-east-1.amazonaws.com/assignment3-lamptey-remix"  # Updated ECR repository URI
 
 phases:  # Defines the phases of the build process
 
@@ -16,13 +16,13 @@ phases:  # Defines the phases of the build process
   pre_build:  # Steps to run before the actual build starts
     commands:
       - echo Logging in to Amazon ECR...  # Logs a message to indicate that login is happening
-      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 992382625926.dkr.ecr.us-east-1.amazonaws.com  # Logs into ECR using AWS credentials
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 112547104148.dkr.ecr.us-east-1.amazonaws.com  # Logs into ECR using AWS credentials
 
   build:  # Actual build phase
     commands:
       - echo Build started on `date`  # Prints the current date and time for reference
-      - docker build -t bobdocbryan/pythonapp:latest .  # Builds the Docker image and tags it with 'latest'
-      - docker tag bobdocbryan/pythonapp:latest $REPOSITORY_URI:latest  # Tags the Docker image with the repository URI
+      - docker build -t assignment3-lamptey-remix:latest .  # Builds the Docker image and tags it with 'latest'
+      - docker tag assignment3-lamptey-remix:latest $REPOSITORY_URI:latest  # Tags the Docker image with the repository URI
 
   post_build:  # Post-build steps to finalize the process
     commands:
